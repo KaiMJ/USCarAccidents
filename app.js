@@ -42,271 +42,430 @@ var question1=function(filePath){
         let rollup = d3.rollups(data, v => v.length, d => d.Year, d => d.Hour)
         let fm = [...rollup].flatMap(([k1, v1]) => [...v1].map(([k2, v2]) => ({Year: k1, Hour: k2, Count: v2})))
          
+        console.log(fm)
 
-        console.log(Array.from(fm.values()))
+        var yr;
+        var hr;
+        var s;
+        var g ;
+        let yrs = Array.from(d3.group(fm, d => d.Year).keys()).sort();
+        var medals = new Array();
+        for (let j = 0; j < yrs.length; j++){
+            for (let i = 0; i < fm.length; i++){
+                for (let k = 0; k < hour.length; k++)
+                    if (yrs[j] == fm[i].Year && hour[k] == fm[i].Hour ) {
+                        yr = yrs[j]
+                        hr = hour[k] 
+                        val = fm[i].Count
+                        medals.push({Year:yr, Hour:hr,  val:val})      
+                }
+            }
+                                
+        } 
+        medals = medals.sort(function(a,b) {return d3.ascending(a.Year,b.Year);});
+        console.log(medals)
 
-const chartSettings = {
-    width: 500,
-    height: 400,
-    padding: 40,
-    titlePadding: 5,
-    columnPadding: 0.4,
-    ticksInXAxis: 5,
-    duration: 3500,
-    ...extendedSettings
-  };
+        var margin = {top: 80, right: 25, bottom: 30, left: 100},
+        width = 1000 - margin.left - margin.right,
+        height = 550 - margin.top - margin.bottom;
 
-  chartSettings.innerWidth = chartSettings.width - chartSettings.padding * 2;
-  chartSettings.innerHeight = chartSettings.height - chartSettings.padding * 2;
+    // append the svg object to the body of the page
+    var svg = d3.select("#q1_plot")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  const chartDataSets = [];
-  let chartTransition;
-  let timerStart, timerEnd;
-  let currentDataSetIndex = 0;
-  let elapsedTime = chartSettings.duration;
+    var myColor = d3.scaleSequential()
+                    .interpolator(d3.interpolateInferno)
+                    .domain([0,100000])
 
-  const chartContainer = d3.select(`#${chartId} .chart-container`);
-  const xAxisContainer = d3.select(`#${chartId} .x-axis`);
-  const yAxisContainer = d3.select(`#${chartId} .y-axis`);
+    var Tooltip = d3.select("#q4_plot").append("div").style("opacity", 0).attr("class", "tooltip");
+               
+    var x = d3.scaleBand()
+              .range([ 0, width ])
+              .domain(hour)
+              .padding(0.05);
 
-  const xAxisScale = d3.scaleLinear().range([0, chartSettings.innerWidth]);
+    svg.append("g")
+        .style("font-size", 12)
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x).tickSize(0))
+        .select(".domain").remove()
 
-  const yAxisScale = d3
-    .scaleBand()
-    .range([0, chartSettings.innerHeight])
-    .padding(chartSettings.columnPadding);
+    var y = d3.scaleBand()
+                .range([ height, 0 ])
+                .domain(years)
+                .padding(0.05);
 
-  d3.select(`#${chartId}`)
-    .attr("width", chartSettings.width)
-    .attr("height", chartSettings.height);
+              svg.append("g")
+                .style("font-size", 12)
+                .call(d3.axisLeft(y).tickSize(0))
+                .select(".domain").remove()
 
-  chartContainer.attr(
-    "transform",
-    `translate(${chartSettings.padding} ${chartSettings.padding})`
-  );
+    svg.selectAll()
+        .data(medals, function(d) {return d.group+':'+d.variable;})
+        .enter()
+        .append("rect")
+          .attr("x", function(d) { return x(d.Hour) })
+          .attr("y", function(d) { return y(d.Year) })
+          .attr("rx", 4)
+          .attr("ry", 4)
+          .attr("width", x.bandwidth() )
+          .attr("height", y.bandwidth() )
+          .style("fill", function(d) { return myColor(d.val)} )
+          .style("stroke-width", 4)
+          .style("stroke", "none")
+          .style("opacity", 0.8)
 
-  chartContainer
-    .select(".current-date")
-    .attr(
-      "transform",
-      `translate(${chartSettings.innerWidth} ${chartSettings.innerHeight})`
-    );
 
-  function draw({ dataSet, date: currentDate }, transition) {
-    const { innerHeight, ticksInXAxis, titlePadding } = chartSettings;
-    const dataSetDescendingOrder = dataSet.sort(
-      ({ value: firstValue }, { value: secondValue }) =>
-        secondValue - firstValue
-    );
+        // var stack = d3.stack().keys(years);
+        // var series = stack(medals);
+        // console.log(series);
 
-    chartContainer.select(".current-date").text(currentDate);
+        // // plotting stacked bar chart
+        // var svgheight = 500;
+        // var svgwidth = 500;
+        // var padding = 50;
 
-    xAxisScale.domain([0, dataSetDescendingOrder[0].value]);
-    yAxisScale.domain(dataSetDescendingOrder.map(({ name }) => name));
+        // var svg = d3.select("#q1_plot").append("svg")
+        //             .attr("width", svgwidth + padding)
+        //             .attr("height", svgheight + padding).append("g")
+        //             .attr("transform", "translate(" + padding + ",0)");
 
-    xAxisContainer.transition(transition).call(
-      d3
-        .axisTop(xAxisScale)
-        .ticks(ticksInXAxis)
-        .tickSize(-innerHeight)
-    );
+        // var xScale = d3.scaleBand()
+        //                 .domain( medals.map(function(d) { return d.Hour;})) //d3.range(medals.length))
+        //                 .range([0, svgwidth-padding])
+        //                 .padding(0.2);
 
-    yAxisContainer
-      .transition(transition)
-      .call(d3.axisLeft(yAxisScale).tickSize(0));
+        //     svg.append("g")
+        //         .attr("transform", "translate(0," + svgheight + ")")
+        //         .call(d3.axisBottom(xScale))
 
-    // The general update Pattern in d3.js
+        // var yScale = d3.scaleLinear()
+        //                 .domain([0, 20000])
+        //                 .range([svgheight, 0]);
+        //     svg.append("g").call(d3.axisLeft(yScale));
 
-    // Data Binding
-    const barGroups = chartContainer
-      .select(".columns")
-      .selectAll("g.column-container")
-      .data(dataSetDescendingOrder, ({ name }) => name);
+        // /*  grouping bars with respect to secondary Key */
+        // var groups = svg.selectAll(".gbars")
+        //                 .data(series).enter().append("g")
+        //                 .attr("class", "gbars")
+        //                 .attr("fill", function(d, i){
+        //                     return 'black';
+        //                 })
+                        
+        // console.log(groups)
+        // /* for each group (Key value), draw a bar */
+        // var rects = groups.selectAll("rect")
+        //                     .data(function(d){
+        //                         console.log(d);
+        //                         return d;
+        //                     }).enter().append("rect")
+        //                     .attr("x", function(d, i){
+        //                         return xScale(d.data.Hour);
+        //                     })
+        //                     .attr("y", function (d) {
+        //                         return yScale(d.data.val);
+        //                     })
+        //                     .attr("width", function(d){
+        //                         return xScale.bandwidth();
+        //                     })
+        //                     .attr("height", function(d){
+        //                         console.log("height: " + (d.data.val-d[0]));
+        //                         return yScale(d[0])-yScale(d[1]);
+        //                     })
 
-    // Enter selection
-    const barGroupsEnter = barGroups
-      .enter()
-      .append("g")
-      .attr("class", "column-container")
-      .attr("transform", `translate(0,${innerHeight})`);
+        // /* add labels for each bar */
+        // var labels = groups.selectAll("text").data(function (d) {
+        //     return d
+        // }).enter().append("text").attr("x", function (d, i) {
+        //     return xScale(d.data.Year) + 1;
+        // }).attr("y", function (d) {
+        //     return yScale(d[1]) + padding/4;
+        // }).text(function (d) {
+        //     return d[1] - d[0];
+        // }).attr("font-family", "sans-serif").attr("font-size", "13px").attr("font-weight", "bold").attr("fill", "black");
 
-    barGroupsEnter
-      .append("rect")
-      .attr("class", "column-rect")
-      .attr("width", 0)
-      .attr("height", yAxisScale.step() * (1 - chartSettings.columnPadding));
+        
+    // var temp = 0;
+    // var max = 0;
+    // var genre_data=[]
+    // years.forEach(yr=>{
+    //     arr=[]
+    //     hour.forEach(hour=>{
 
-    barGroupsEnter
-      .append("text")
-      .attr("class", "column-title")
-      .attr("y", (yAxisScale.step() * (1 - chartSettings.columnPadding)) / 2)
-      .attr("x", -titlePadding)
-      .text(({ name }) => name);
 
-    barGroupsEnter
-      .append("text")
-      .attr("class", "column-value")
-      .attr("y", (yAxisScale.step() * (1 - chartSettings.columnPadding)) / 2)
-      .attr("x", titlePadding)
-      .text(0);
 
-    // Update selection
-    const barUpdate = barGroupsEnter.merge(barGroups);
+    //         genre_data.push(obj);
+    //     })
+        
+    // })
+    // console.log(genre_data)
 
-    barUpdate
-      .transition(transition)
-      .attr("transform", ({ name }) => `translate(0,${yAxisScale(name)})`)
-      .attr("fill", "normal");
+// const chartSettings = {
+//     width: 500,
+//     height: 400,
+//     padding: 40,
+//     titlePadding: 5,
+//     columnPadding: 0.4,
+//     ticksInXAxis: 5,
+//     duration: 3500,
+//     ...extendedSettings
+//   };
 
-    barUpdate
-      .select(".column-rect")
-      .transition(transition)
-      .attr("width", ({ value }) => xAxisScale(value));
+//   chartSettings.innerWidth = chartSettings.width - chartSettings.padding * 2;
+//   chartSettings.innerHeight = chartSettings.height - chartSettings.padding * 2;
 
-    barUpdate
-      .select(".column-title")
-      .transition(transition)
-      .attr("x", ({ value }) => xAxisScale(value) - titlePadding);
+//   const chartDataSets = [];
+//   let chartTransition;
+//   let timerStart, timerEnd;
+//   let currentDataSetIndex = 0;
+//   let elapsedTime = chartSettings.duration;
 
-    barUpdate
-      .select(".column-value")
-      .transition(transition)
-      .attr("x", ({ value }) => xAxisScale(value) + titlePadding)
-      .tween("text", function({ value }) {
-        const interpolateStartValue =
-          elapsedTime === chartSettings.duration
-            ? this.currentValue || 0
-            : +this.innerHTML;
+//   const chartContainer = d3.select(`#${chartId} .chart-container`);
+//   const xAxisContainer = d3.select(`#${chartId} .x-axis`);
+//   const yAxisContainer = d3.select(`#${chartId} .y-axis`);
 
-        const interpolate = d3.interpolate(interpolateStartValue, value);
-        this.currentValue = value;
+//   const xAxisScale = d3.scaleLinear().range([0, chartSettings.innerWidth]);
 
-        return function(t) {
-          d3.select(this).text(Math.ceil(interpolate(t)));
-        };
-      });
+//   const yAxisScale = d3
+//     .scaleBand()
+//     .range([0, chartSettings.innerHeight])
+//     .padding(chartSettings.columnPadding);
 
-    // Exit selection
-    const bodyExit = barGroups.exit();
+//   d3.select(`#${chartId}`)
+//     .attr("width", chartSettings.width)
+//     .attr("height", chartSettings.height);
 
-    bodyExit
-      .transition(transition)
-      .attr("transform", `translate(0,${innerHeight})`)
-      .on("end", function() {
-        d3.select(this).attr("fill", "none");
-      });
+//   chartContainer.attr(
+//     "transform",
+//     `translate(${chartSettings.padding} ${chartSettings.padding})`
+//   );
 
-    bodyExit
-      .select(".column-title")
-      .transition(transition)
-      .attr("x", 0);
+//   chartContainer
+//     .select(".current-date")
+//     .attr(
+//       "transform",
+//       `translate(${chartSettings.innerWidth} ${chartSettings.innerHeight})`
+//     );
 
-    bodyExit
-      .select(".column-rect")
-      .transition(transition)
-      .attr("width", 0);
+//   function draw({ dataSet, date: currentDate }, transition) {
+//     const { innerHeight, ticksInXAxis, titlePadding } = chartSettings;
+//     const dataSetDescendingOrder = dataSet.sort(
+//       ({ value: firstValue }, { value: secondValue }) =>
+//         secondValue - firstValue
+//     );
 
-    bodyExit
-      .select(".column-value")
-      .transition(transition)
-      .attr("x", titlePadding)
-      .tween("text", function() {
-        const interpolate = d3.interpolate(this.currentValue, 0);
-        this.currentValue = 0;
+//     chartContainer.select(".current-date").text(currentDate);
 
-        return function(t) {
-          d3.select(this).text(Math.ceil(interpolate(t)));
-        };
-      });
+//     xAxisScale.domain([0, dataSetDescendingOrder[0].value]);
+//     yAxisScale.domain(dataSetDescendingOrder.map(({ name }) => name));
 
-    return this;
-  }
+//     xAxisContainer.transition(transition).call(
+//       d3
+//         .axisTop(xAxisScale)
+//         .ticks(ticksInXAxis)
+//         .tickSize(-innerHeight)
+//     );
 
-  function addDataset(dataSet) {
-    chartDataSets.push(dataSet);
+//     yAxisContainer
+//       .transition(transition)
+//       .call(d3.axisLeft(yAxisScale).tickSize(0));
 
-    return this;
-  }
+//     // The general update Pattern in d3.js
 
-  function addDatasets(dataSets) {
-    chartDataSets.push.apply(chartDataSets, dataSets);
+//     // Data Binding
+//     const barGroups = chartContainer
+//       .select(".columns")
+//       .selectAll("g.column-container")
+//       .data(dataSetDescendingOrder, ({ name }) => name);
 
-    return this;
-  }
+//     // Enter selection
+//     const barGroupsEnter = barGroups
+//       .enter()
+//       .append("g")
+//       .attr("class", "column-container")
+//       .attr("transform", `translate(0,${innerHeight})`);
 
-  function setTitle(title) {
-    d3.select(".chart-title")
-      .attr("x", chartSettings.width / 2)
-      .attr("y", -chartSettings.padding / 2)
-      .text(title);
+//     barGroupsEnter
+//       .append("rect")
+//       .attr("class", "column-rect")
+//       .attr("width", 0)
+//       .attr("height", yAxisScale.step() * (1 - chartSettings.columnPadding));
 
-    return this;
-  }
+//     barGroupsEnter
+//       .append("text")
+//       .attr("class", "column-title")
+//       .attr("y", (yAxisScale.step() * (1 - chartSettings.columnPadding)) / 2)
+//       .attr("x", -titlePadding)
+//       .text(({ name }) => name);
 
-  /* async function render() {
-    for (const chartDataSet of chartDataSets) {
-      chartTransition = chartContainer
-        .transition()
-        .duration(chartSettings.duration)
-        .ease(d3.easeLinear);
+//     barGroupsEnter
+//       .append("text")
+//       .attr("class", "column-value")
+//       .attr("y", (yAxisScale.step() * (1 - chartSettings.columnPadding)) / 2)
+//       .attr("x", titlePadding)
+//       .text(0);
 
-      draw(chartDataSet, chartTransition);
+//     // Update selection
+//     const barUpdate = barGroupsEnter.merge(barGroups);
 
-      await chartTransition.end();
-    }
-  } */
+//     barUpdate
+//       .transition(transition)
+//       .attr("transform", ({ name }) => `translate(0,${yAxisScale(name)})`)
+//       .attr("fill", "normal");
 
-  async function render(index = 0) {
-    currentDataSetIndex = index;
-    timerStart = d3.now();
+//     barUpdate
+//       .select(".column-rect")
+//       .transition(transition)
+//       .attr("width", ({ value }) => xAxisScale(value));
 
-    chartTransition = chartContainer
-      .transition()
-      .duration(elapsedTime)
-      .ease(d3.easeLinear)
-      .on("end", () => {
-        if (index < chartDataSets.length) {
-          elapsedTime = chartSettings.duration;
-          render(index + 1);
-        } else {
-          d3.select("button").text("Play");
-        }
-      })
-      .on("interrupt", () => {
-        timerEnd = d3.now();
-      });
+//     barUpdate
+//       .select(".column-title")
+//       .transition(transition)
+//       .attr("x", ({ value }) => xAxisScale(value) - titlePadding);
 
-    if (index < chartDataSets.length) {
-      draw(chartDataSets[index], chartTransition);
-    }
+//     barUpdate
+//       .select(".column-value")
+//       .transition(transition)
+//       .attr("x", ({ value }) => xAxisScale(value) + titlePadding)
+//       .tween("text", function({ value }) {
+//         const interpolateStartValue =
+//           elapsedTime === chartSettings.duration
+//             ? this.currentValue || 0
+//             : +this.innerHTML;
 
-    return this;
-  }
+//         const interpolate = d3.interpolate(interpolateStartValue, value);
+//         this.currentValue = value;
 
-  function stop() {
-    d3.select(`#${chartId}`)
-      .selectAll("*")
-      .interrupt();
+//         return function(t) {
+//           d3.select(this).text(Math.ceil(interpolate(t)));
+//         };
+//       });
 
-    return this;
-  }
+//     // Exit selection
+//     const bodyExit = barGroups.exit();
 
-  function start() {
-    elapsedTime -= timerEnd - timerStart;
+//     bodyExit
+//       .transition(transition)
+//       .attr("transform", `translate(0,${innerHeight})`)
+//       .on("end", function() {
+//         d3.select(this).attr("fill", "none");
+//       });
 
-    render(currentDataSetIndex);
+//     bodyExit
+//       .select(".column-title")
+//       .transition(transition)
+//       .attr("x", 0);
 
-    return this;
-  }
+//     bodyExit
+//       .select(".column-rect")
+//       .transition(transition)
+//       .attr("width", 0);
 
-  return {
-    addDataset,
-    addDatasets,
-    render,
-    setTitle,
-    start,
-    stop
-  };
+//     bodyExit
+//       .select(".column-value")
+//       .transition(transition)
+//       .attr("x", titlePadding)
+//       .tween("text", function() {
+//         const interpolate = d3.interpolate(this.currentValue, 0);
+//         this.currentValue = 0;
+
+//         return function(t) {
+//           d3.select(this).text(Math.ceil(interpolate(t)));
+//         };
+//       });
+
+//     return this;
+//   }
+
+//   function addDataset(dataSet) {
+//     chartDataSets.push(dataSet);
+
+//     return this;
+//   }
+
+//   function addDatasets(dataSets) {
+//     chartDataSets.push.apply(chartDataSets, dataSets);
+
+//     return this;
+//   }
+
+//   function setTitle(title) {
+//     d3.select(".chart-title")
+//       .attr("x", chartSettings.width / 2)
+//       .attr("y", -chartSettings.padding / 2)
+//       .text(title);
+
+//     return this;
+//   }
+
+//   /* async function render() {
+//     for (const chartDataSet of chartDataSets) {
+//       chartTransition = chartContainer
+//         .transition()
+//         .duration(chartSettings.duration)
+//         .ease(d3.easeLinear);
+
+//       draw(chartDataSet, chartTransition);
+
+//       await chartTransition.end();
+//     }
+//   } */
+
+//   async function render(index = 0) {
+//     currentDataSetIndex = index;
+//     timerStart = d3.now();
+
+//     chartTransition = chartContainer
+//       .transition()
+//       .duration(elapsedTime)
+//       .ease(d3.easeLinear)
+//       .on("end", () => {
+//         if (index < chartDataSets.length) {
+//           elapsedTime = chartSettings.duration;
+//           render(index + 1);
+//         } else {
+//           d3.select("button").text("Play");
+//         }
+//       })
+//       .on("interrupt", () => {
+//         timerEnd = d3.now();
+//       });
+
+//     if (index < chartDataSets.length) {
+//       draw(chartDataSets[index], chartTransition);
+//     }
+
+//     return this;
+//   }
+
+//   function stop() {
+//     d3.select(`#${chartId}`)
+//       .selectAll("*")
+//       .interrupt();
+
+//     return this;
+//   }
+
+//   function start() {
+//     elapsedTime -= timerEnd - timerStart;
+
+//     render(currentDataSetIndex);
+
+//     return this;
+//   }
+
+//   return {
+//     addDataset,
+//     addDatasets,
+//     render,
+//     setTitle,
+//     start,
+//     stop
+//   };
   
    //   svg.append('g')
    //     .attr('class', 'axis xAxis')
