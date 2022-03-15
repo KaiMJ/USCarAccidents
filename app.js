@@ -174,10 +174,10 @@ var question2=function(filePath){
         };
     }
 
-    const data = d3.csv(filePath, rowConverter);
-    data.then(function(data){
-        console.log(data);
-    });
+     const data = d3.csv(filePath, rowConverter);
+    // data.then(function(data){
+    //     console.log(data);
+    // });
 
     data.then(function(data) {
 
@@ -190,7 +190,7 @@ var question2=function(filePath){
             Accident: d.Accident
           }
         });
-        console.log(data)
+        //console.log(data)
 
         let rollup = d3.rollups(data, v => v.length, d => d.Year, d => d.Month)
         let fm = [...rollup].flatMap(([k1, v1]) => [...v1].map(([k2, v2]) => ({Year: k1, Month: k2, Count: v2})))
@@ -199,7 +199,7 @@ var question2=function(filePath){
 
         fm3= d3.group(fm2, d => d.Year)
 
-        console.log(fm3)
+        //console.log(fm3)
 
         // columnsToSum = ['Month']
 
@@ -350,10 +350,10 @@ var question3=function(filePath){
         };
     }
 
-    const data = d3.csv(filePath, rowConverter);
-    data.then(function(data){
-        console.log(data);
-    });
+     const data = d3.csv(filePath, rowConverter);
+    // data.then(function(data){
+    //     console.log(data);
+    // });
 
     data.then(function(data) {
 
@@ -400,10 +400,10 @@ var question3=function(filePath){
                                   d => d.time
                                  ).map(([k, v]) => ({ time: k, Count: v })).sort(function(a,b) {return d3.ascending(a.time,b.time);});
 
-        console.log(val_cnts);
+        //console.log(val_cnts);
 
 
-        console.log(val_cnts);
+        //console.log(val_cnts);
 
         // BAR PLOT
         var svgwidth = 500;
@@ -488,6 +488,124 @@ var question3=function(filePath){
 }
 
 var question4=function(filePath){
+
+  var rowConverter = function(d){
+    if ((parseInt(d.Severity)== 4)){
+        return {
+            
+
+            'Wind_Speed': parseFloat(d['Wind_Speed(mph)']),
+            'Temperature': parseFloat(d['Temperature(F)']),
+            'Precipitation': parseFloat(d['Precipitation(in)']),
+            'Pressure': parseFloat(d['Pressure(in)']),
+            'Visibility': parseFloat(d['Visibility(mi)']),
+            'Humidity': parseFloat(d['Humidity(%)'])
+
+        }
+     }
+    }
+
+    const data = d3.csv(filePath, rowConverter);
+    // data.then(function(data){
+    //     console.log(data);
+    // });
+
+    data.then(function(data) {
+
+
+       // change_axis('none', 'none', data)
+
+
+
+var margin = {top: 10, right: 30, bottom: 30, left: 60},
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+
+      var svg = d3.select("#q4_plot")
+                  .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                    .attr("transform",
+                          "translate(" + margin.left + "," + margin.top + ")");
+
+
+                var xScale = d3.scaleLinear()
+                       .range([ 0, width])
+                       .domain([-10, d3.max(data, function(d){return d.Humidity;})])
+
+
+                svg.append("g")
+                   .attr("transform", "translate(0," + height + ")")
+                   .call(d3.axisBottom(xScale))
+
+                var yScale = d3.scaleLinear()
+                       .range([ height, 0])
+                       .domain([d3.min(data, function(d){return d.Temperature;}), d3.max(data, function(d){return d.Temperature;})+20])
+
+                svg.append("g").call(d3.axisLeft(yScale));
+
+
+                  svg
+                    .selectAll("dot")
+                     .data(data)
+                     .enter()
+                     .append("circle")
+                       .attr("cx", function (d) { return xScale(d.Humidity); } )
+                       .attr("cy", function (d) { return yScale(d.Temperature); } )
+                       .attr("r", 1.5)
+                       .style("fill", "#69b3a2")
+
+//                   // Add dots
+           
+        // svg.selectAll("circle")
+        //     .data(data).enter().append("circle")
+        //     .attr("cx", function(d){
+        //         return xScale(d.Humidity);
+        //     })
+        //     .attr("cy", function(d){
+        //         return yScale(d.Temperature);
+        //     })
+        //     .attr("r", .45).attr("fill", "#69b3a2")
+
+        //     console.log(d3.max(data, function(d){return d.Humidity;}))
+
+
+
+                // svg.select("circle3")
+                // .data(data).enter().append("circle")
+                // .attr("cx", function(d){
+                //     return xScale(d.Precipitation);
+                // })
+                // .attr("cy", function(d){
+                //     return yScale(d.Temperature);
+                // })
+                // .attr("r", 1).attr("fill", 'black')
+   
+
+
+            
+
+
+        //}
+
+
+        // d3.select("#drop_down_y_q4").attr('name','x').on("change",d=>{
+        // //console.log(d.target.value);
+        // x = ('x', d.target.value, data)
+        // })
+
+        // d3.select("#drop_down_y_q4").attr('name','y').on("change",d=>{
+        // //console.log(d.target.value);
+        // y = change_axis('y', d.target.value, data)
+        // })
+
+        // console.log(x)
+        // console.log(y)
+
+
+    });
    
 }
 
@@ -497,14 +615,14 @@ var question5=function(filePath){
     var rowConverter = function(d){
         return {
             Severity: d.Severity,
-            'Temperature': d['Temperature(F)']
+            'Temperature': parseFloat(d['Temperature(F)'])
         };
     }
 
     const data = d3.csv(filePath, rowConverter);
-    data.then(function(data){
-        console.log(data);
-    });
+    // data.then(function(data){
+    //     console.log(data);
+    // });
 
     data.then(function(data) {
 
@@ -517,7 +635,7 @@ var question5=function(filePath){
 
         })
 
-    console.log(f)
+    //console.log(f)
 
     // Compute summary statistics used for the box:
     var data_sorted = f.sort(d3.ascending)
@@ -602,7 +720,7 @@ svg
 
         })
 
-    console.log(f)
+    //console.log(f)
 
     // Compute summary statistics used for the box:
     var data_sorted = f.sort(d3.ascending)
@@ -651,7 +769,7 @@ svg
 
         })
 
-    console.log(f)
+    //console.log(f)
 
     // Compute summary statistics used for the box:
     var data_sorted = f.sort(d3.ascending)
@@ -700,7 +818,7 @@ svg
 
         })
 
-    console.log(f)
+    //console.log(f)
 
     // Compute summary statistics used for the box:
     var data_sorted = f.sort(d3.ascending)
@@ -742,24 +860,24 @@ svg
   .attr("stroke", "black")
 
 
-                    // ADD X AND Y AXIS TITLES
-            svg.append("text")
-                .attr("class", "x_label")
-                .attr("text-anchor", "middle")
-                .attr("x", 300)
-                .attr("y", height )
-                .attr("dy", "1.85em")
-                .text("Severity Category").attr("font-family", "sans-serif").attr("font-size", "13px").attr("font-weight", "bold").attr("fill", "black");
+            // ADD X AND Y AXIS TITLES
+    svg.append("text")
+        .attr("class", "x_label")
+        .attr("text-anchor", "middle")
+        .attr("x", 300)
+        .attr("y", height )
+        .attr("dy", "1.85em")
+        .text("Severity Category").attr("font-family", "sans-serif").attr("font-size", "13px").attr("font-weight", "bold").attr("fill", "black");
 
-            svg.append("text")
-                .attr("class", "y_yabel")
-                .attr("text-anchor", "end")
-                .attr("x", -height/2 )
-                .attr("y",-50)
-                .attr("dy", "1.8em")
-                .attr("dx", "4em")
-                .attr("transform", "rotate(-90)")
-                .text("Temperature (Farenheight)").attr("font-family", "sans-serif").attr("font-size", "13px").attr("font-weight", "bold").attr("fill", "black");
+    svg.append("text")
+        .attr("class", "y_yabel")
+        .attr("text-anchor", "end")
+        .attr("x", -height/2 )
+        .attr("y",-50)
+        .attr("dy", "1.8em")
+        .attr("dx", "4em")
+        .attr("transform", "rotate(-90)")
+        .text("Temperature (Farenheight)").attr("font-family", "sans-serif").attr("font-size", "13px").attr("font-weight", "bold").attr("fill", "black");
 
 
     });
@@ -767,13 +885,3 @@ svg
 
 }
 
-
-function plot() {
-    var filePath = 'cleanData.csv'
-    const csv = d3.csv(filePath)
-    console.log('hd')
-    csv.then(function (data) {
-        console.log(data)
-        console.log('hi')
-    })
-}
