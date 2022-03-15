@@ -47,7 +47,7 @@ var question1=function(filePath){
         var s;
         var g ;
         var max = 0;
-        var min = 9999;
+        var min = 9999999999999;
         let yrs = Array.from(d3.group(fm, d => d.Year).keys()).sort();
         var medals = new Array();
         for (let j = 0; j < yrs.length; j++){
@@ -255,6 +255,7 @@ var question2=function(filePath){
 
             svg.append("g")
                .attr("transform", "translate(0," + svgheight + ")")
+               .transition().duration(1000)
                .call(d3.axisBottom(xScale).tickFormat(formatxAxis).ticks(12))
 
             var yScale = d3.scaleLinear()
@@ -262,10 +263,13 @@ var question2=function(filePath){
                               d3.max(data, function(d){return d.Count;}) + padding*125])//d3.max(d.Count)+padding/3])
                            .range([svgheight,0]);
 
-            svg.append("g").call(d3.axisLeft(yScale));
+            svg.append("g")
+            .transition().duration(1000)
+            .call(d3.axisLeft(yScale));
 
             var Tooltip = d3.select("#q3_plot").append("div").style("opacity", 0).attr("class", "tooltip");
-           
+
+
             svg.append('g').selectAll(".q3circle")
                 .data(data).enter().append("circle")
                 .attr("cx", function(d,i){
@@ -290,7 +294,8 @@ var question2=function(filePath){
                     Tooltip.style("visibility", "hidden")
                 })
 
-            svg.append('path').datum(data)
+            svg.append('path').datum(data).transition()
+          .duration(1000)
                               .attr("fill", "none")
                               .attr("stroke", 'blue')
                               .attr("stroke-width", 1.5)
@@ -355,37 +360,39 @@ var question3=function(filePath){
 
 
 
+    var yr_data = data.map(function(d) {
+          return {
+            time:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
+           // Month: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
+            Accident: d.Accident
+          }
+
+    });
+
+    var mn_data = data.map(function(d) {
+          return {
+            //Year:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
+            time: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
+            Accident: d.Accident
+          }
+    });
+
+    var hr_data = data.map(function(d) {
+          return {
+            time: parseInt(d.Start_Time.match(/(?<![\d]{4}[-][\d]{2}[-]\d]{2}) \d\d/)[0]),
+            //Year:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
+            //Month: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
+            Accident: d.Accident
+          }
+    });
+
+
 
     var getBars=function(data, str){
 
         d3.select('#q3_plot').select('svg').remove()
 
-        if (str == 'Year'){
-            var data = data.map(function(d) {
-              return {
-                time:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
-               // Month: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
-                Accident: d.Accident
-              }
-            });
-        } else if (str == 'Month'){
-            var data = data.map(function(d) {
-              return {
-                //Year:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
-                time: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
-                Accident: d.Accident
-              }
-            });
-        } else if (str == 'Hour'){
-            var data = data.map(function(d) {
-              return {
-                time: parseInt(d.Start_Time.match(/(?<![\d]{4}[-][\d]{2}[-]\d]{2}) \d\d/)[0]),
-                //Year:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
-                //Month: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
-                Accident: d.Accident
-              }
-        });
-        }
+
         console.log(data)
         
         // Participation value counts for each year for Females After 1980
@@ -414,7 +421,7 @@ var question3=function(filePath){
                        .range([ 0, svgwidth - padding])
                        .domain(val_cnts.map(function(d) { return d.time;})).padding(0.2);
 
-        svg.append("g")
+        svg.append("g").transition().duration(1000)
            .attr("transform", "translate(0," + svgheight + ")")
            .call(d3.axisBottom(xScale))
 
@@ -424,13 +431,15 @@ var question3=function(filePath){
                                 d3.max(val_cnts, function(d){return d.Count;})+ padding*100])
                        .range([svgheight,0]);
         
-        svg.append("g").call(d3.axisLeft(yScale));
+        svg.append("g").transition().duration(1000)
+        .call(d3.axisLeft(yScale));
 
         // Bars
         svg.selectAll("mybar")
            .data(val_cnts)
            .enter()
-           .append("rect")
+           .append("rect").transition()
+          .duration(1000)
            .attr("x", function(d) { return xScale(d.time);})
            .attr("y", function(d) { return yScale(d.Count);})
            .attr("width", xScale.bandwidth())
@@ -458,11 +467,18 @@ var question3=function(filePath){
         }
 
                 // console.log(fm3.get(2016))
-       getBars(data, 'Year')
+       getBars(yr_data, 'Year')
         d3.select("#radio_q3").attr('name','time').on("change",d=>{
             console.log(d.target.value);
-            var year = d.target.value
-            getBars(data, year)
+            var str = d.target.value
+            if (str == 'Year'){
+                getBars(yr_data, str)
+            } else if (str == 'Month'){
+                getBars(mn_data, str)
+            } else if (str == 'Hour'){
+                getBars(hr_data, str)
+            }
+            
             console.log(year)
         })
 
