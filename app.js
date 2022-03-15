@@ -1,8 +1,8 @@
 function assignment2(){
     var filePath="cleanData.csv";
-    question3(filePath);
-    question2(filePath);
     question1(filePath);
+    question2(filePath);
+    question3(filePath);
     question4(filePath);
     question5(filePath);
 }
@@ -243,13 +243,19 @@ var question2=function(filePath){
                     .attr("height", svgheight + padding).append("g")
                     .attr("transform", "translate(" + padding + ",0)");
 
-            var xScale = d3.scaleBand()//                           .domain(d3.extent(data,d=>d.Month))
-                           .range([ 0, svgwidth-padding  ])
-                           .domain(data.map(function(d) { return d.Month;}));
+            // var xScale = d3.scaleBand()//                           .domain(d3.extent(data,d=>d.Month))
+            //                .range([ 0, svgwidth-padding  ])
+            //                .domain(data.map(function(d) { return d.Month;}));
+
+            var formatxAxis = d3.format('.0f');
+
+            var xScale = d3.scaleTime()
+                           .domain(d3.extent(data,d=>d.Month))
+                           .range([ 0, svgwidth-padding  ]);
 
             svg.append("g")
                .attr("transform", "translate(0," + svgheight + ")")
-               .call(d3.axisBottom(xScale).ticks(12))
+               .call(d3.axisBottom(xScale).tickFormat(formatxAxis).ticks(12))
 
             var yScale = d3.scaleLinear()
                            .domain([0,
