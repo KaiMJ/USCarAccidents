@@ -47,7 +47,7 @@ var question1=function(filePath){
         var s;
         var g ;
         var max = 0;
-        var min = 9999;
+        var min = 9999999999999;
         let yrs = Array.from(d3.group(fm, d => d.Year).keys()).sort();
         var medals = new Array();
         for (let j = 0; j < yrs.length; j++){
@@ -126,7 +126,7 @@ var question1=function(filePath){
           .style("stroke", "none")
           .style("opacity", 0.8)
         .on('mouseover', function(event, d){
-            d3.select(this).style("stroke", "grey")
+            d3.select(this).style("stroke", "black")
             Tooltip.style("visibility", "visible")
             Tooltip.html(d.val.toLocaleString('en-US')).style('left', event.pageX + 'px').style('top', event.pageY + 'px')
         })
@@ -255,6 +255,7 @@ var question2=function(filePath){
 
             svg.append("g")
                .attr("transform", "translate(0," + svgheight + ")")
+               .transition().duration(1000)
                .call(d3.axisBottom(xScale).tickFormat(formatxAxis).ticks(12))
 
             var yScale = d3.scaleLinear()
@@ -262,11 +263,15 @@ var question2=function(filePath){
                               d3.max(data, function(d){return d.Count;}) + padding*125])//d3.max(d.Count)+padding/3])
                            .range([svgheight,0]);
 
-            svg.append("g").call(d3.axisLeft(yScale));
+            svg.append("g")
+            .transition().duration(1000)
+            .call(d3.axisLeft(yScale));
 
             var Tooltip = d3.select("#q3_plot").append("div").style("opacity", 0).attr("class", "tooltip");
-           
-            svg.append('g').selectAll(".q3circle")
+
+
+            svg.append('g')
+            .selectAll(".q3circle")
                 .data(data).enter().append("circle")
                 .attr("cx", function(d,i){
                     return xScale(d.Month);
@@ -274,10 +279,10 @@ var question2=function(filePath){
                 .attr("cy", function(d){
                     return yScale(d.Count);
                 })
-                .attr("r", 5)
+                .attr("r", 7)
                 .attr("fill", 'blue')
                 .on('mouseover', function(event, d){
-                    d3.select(this).attr("stroke-width", 2).style("stroke", "grey")
+                    d3.select(this).attr("stroke-width", 2).style("stroke", "black")
                     Tooltip.style("visibility", "visible")
                     Tooltip.html(d.Count).style('left', event.pageX + 'px').style('top', event.pageY + 'px')                
                 })
@@ -289,8 +294,8 @@ var question2=function(filePath){
                     d3.select(this).style("stroke", "none")
                     Tooltip.style("visibility", "hidden")
                 })
-
-            svg.append('path').datum(data)
+            svg.append('path').datum(data).transition()
+          .duration(1000)
                               .attr("fill", "none")
                               .attr("stroke", 'blue')
                               .attr("stroke-width", 1.5)
@@ -355,37 +360,39 @@ var question3=function(filePath){
 
 
 
+    var yr_data = data.map(function(d) {
+          return {
+            time:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
+           // Month: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
+            Accident: d.Accident
+          }
+
+    });
+
+    var mn_data = data.map(function(d) {
+          return {
+            //Year:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
+            time: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
+            Accident: d.Accident
+          }
+    });
+
+    var hr_data = data.map(function(d) {
+          return {
+            time: parseInt(d.Start_Time.match(/(?<![\d]{4}[-][\d]{2}[-]\d]{2}) \d\d/)[0]),
+            //Year:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
+            //Month: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
+            Accident: d.Accident
+          }
+    });
+
+
 
     var getBars=function(data, str){
 
         d3.select('#q3_plot').select('svg').remove()
 
-        if (str == 'Year'){
-            var data = data.map(function(d) {
-              return {
-                time:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
-               // Month: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
-                Accident: d.Accident
-              }
-            });
-        } else if (str == 'Month'){
-            var data = data.map(function(d) {
-              return {
-                //Year:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
-                time: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
-                Accident: d.Accident
-              }
-            });
-        } else if (str == 'Hour'){
-            var data = data.map(function(d) {
-              return {
-                time: parseInt(d.Start_Time.match(/(?<![\d]{4}[-][\d]{2}[-]\d]{2}) \d\d/)[0]),
-                //Year:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
-                //Month: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
-                Accident: d.Accident
-              }
-        });
-        }
+
         console.log(data)
         
         // Participation value counts for each year for Females After 1980
@@ -414,7 +421,7 @@ var question3=function(filePath){
                        .range([ 0, svgwidth - padding])
                        .domain(val_cnts.map(function(d) { return d.time;})).padding(0.2);
 
-        svg.append("g")
+        svg.append("g").transition().duration(1000)
            .attr("transform", "translate(0," + svgheight + ")")
            .call(d3.axisBottom(xScale))
 
@@ -424,13 +431,15 @@ var question3=function(filePath){
                                 d3.max(val_cnts, function(d){return d.Count;})+ padding*100])
                        .range([svgheight,0]);
         
-        svg.append("g").call(d3.axisLeft(yScale));
+        svg.append("g").transition().duration(1000)
+        .call(d3.axisLeft(yScale));
 
         // Bars
         svg.selectAll("mybar")
            .data(val_cnts)
            .enter()
-           .append("rect")
+           .append("rect").transition()
+          .duration(1000)
            .attr("x", function(d) { return xScale(d.time);})
            .attr("y", function(d) { return yScale(d.Count);})
            .attr("width", xScale.bandwidth())
@@ -458,11 +467,18 @@ var question3=function(filePath){
         }
 
                 // console.log(fm3.get(2016))
-       getBars(data, 'Year')
+       getBars(yr_data, 'Year')
         d3.select("#radio_q3").attr('name','time').on("change",d=>{
             console.log(d.target.value);
-            var year = d.target.value
-            getBars(data, year)
+            var str = d.target.value
+            if (str == 'Year'){
+                getBars(yr_data, str)
+            } else if (str == 'Month'){
+                getBars(mn_data, str)
+            } else if (str == 'Hour'){
+                getBars(hr_data, str)
+            }
+            
             console.log(year)
         })
 
@@ -477,6 +493,70 @@ var question4=function(filePath){
 
 
 var question5=function(filePath){
+
+    var rowConverter = function(d){
+        return {
+            Severity: d.Severity,
+            'Temperature': d['Temperature(F)']
+        };
+    }
+
+    const data = d3.csv(filePath, rowConverter);
+    data.then(function(data){
+        console.log(data);
+    });
+
+    data.then(function(data) {
+
+    let data2 = [1, 2, 3, 4, 5]
+    let stats = d3.boxplotStats(data2)
+    let x = d3.scaleLinear()
+      .domain(d3.extent(data2))
+      .range([0, 300])
+    let plot = d3.boxplot().scale(x)
+    d3.select('#q5_plot').datum(stats).call(plot)
+  //   const X = d3.map(data, function(d){return d.Severity;});
+  //   const Y = d3.map(data, function(d){return d.Temperature;});
+
+  // // Filter undefined values.
+  // const I = d3.range(X.length).filter(i => !isNaN(X[i]) && !isNaN(Y[i]));
+
+  // // Compute the bins.
+  // const B = d3.bin()
+  //     .thresholds(d3.map(data, function(d){return d.Temperature;}))
+  //     .value(i => X[i])
+  //   (I)
+  //   .map(bin => {
+  //     const y = i => Y[i];
+  //     const min = d3.min(bin, y);
+  //     const max = d3.max(bin, y);
+  //     const q1 = d3.quantile(bin, 0.25, y);
+  //     const q2 = d3.quantile(bin, 0.50, y);
+  //     const q3 = d3.quantile(bin, 0.75, y);
+  //     const iqr = q3 - q1; // interquartile range
+  //     const r0 = Math.max(min, q1 - iqr * 1.5);
+  //     const r1 = Math.min(max, q3 + iqr * 1.5);
+  //     bin.quartiles = [q1, q2, q3];
+  //     bin.range = [r0, r1];
+  //     bin.outliers = bin.filter(i => Y[i] < r0 || Y[i] > r1);
+  //     return bin;
+  //   });
+
+  //   console.log(B)
+
+    // var data_sorted = data.sort(d3.ascending)
+    // var q1 = d3.quantile(data_sorted, .25)
+    // var median = d3.quantile(data_sorted, .5)
+    // var q3 = d3.quantile(data_sorted, .75)
+    // var interQuantileRange = q3 - q1
+    // var min = q1 - 1.5 * interQuantileRange
+    // var max = q1 + 1.5 * interQuantileRange
+
+    // console.log(val_cnts);
+
+
+
+    });
 
 
 }
