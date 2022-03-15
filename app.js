@@ -1,8 +1,8 @@
 function assignment2(){
     var filePath="cleanData.csv";
-    question1(filePath);
-    question2(filePath);
     question3(filePath);
+    question2(filePath);
+    question1(filePath);
     question4(filePath);
     question5(filePath);
 }
@@ -312,7 +312,6 @@ var question2=function(filePath){
                 .attr("transform", "rotate(-90)")
                 .text("Number of Accidents").attr("font-family", "sans-serif").attr("font-size", "13px").attr("font-weight", "bold").attr("fill", "black");
 
-
         }
 
 
@@ -332,6 +331,137 @@ var question2=function(filePath){
 }
 
 var question3=function(filePath){
+
+
+    var rowConverter = function(d){
+        return {
+            Start_Time: d.Start_Time,
+            Accident: d.ID
+        };
+    }
+
+    const data = d3.csv(filePath, rowConverter);
+    data.then(function(data){
+        console.log(data);
+    });
+
+    data.then(function(data) {
+
+
+
+
+    var getBars=function(data, str){
+
+        d3.select('#q3_plot').select('svg').remove()
+
+        if (str == 'Year'){
+            var data = data.map(function(d) {
+              return {
+                time:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
+               // Month: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
+                Accident: d.Accident
+              }
+            });
+        } else if (str == 'Month'){
+            var data = data.map(function(d) {
+              return {
+                //Year:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
+                time: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
+                Accident: d.Accident
+              }
+            });
+        } else if (str == 'Hour'){
+            var data = data.map(function(d) {
+              return {
+                time: parseInt(d.Start_Time.match(/(?<![\d]{4}[-][\d]{2}[-]\d]{2}) \d\d/)[0]),
+                //Year:  parseInt(d.Start_Time.match(/.{0,4}/)[0]),
+                //Month: parseInt(d.Start_Time.match(/(?<![\d]{4}-)-(\d\d)(?=[-\d])/)[0].replace('-', '')),
+                Accident: d.Accident
+              }
+        });
+        }
+        console.log(data)
+        
+        // Participation value counts for each year for Females After 1980
+        var val_cnts = d3.rollups(data,
+                                  xs => d3.count(xs, x => x.time),
+                                  d => d.time
+                                 ).map(([k, v]) => ({ time: k, Count: v })).sort(function(a,b) {return d3.ascending(a.time,b.time);});
+
+        console.log(val_cnts);
+
+
+        console.log(val_cnts);
+
+        // BAR PLOT
+        var svgwidth = 500;
+        var svgheight = 500;
+        var padding = 70;
+
+        var svg = d3.select("#q3_plot").append("svg")
+                    .attr("width", svgwidth + padding)
+                    .attr("height", svgheight + padding).append("g")
+                    .attr("transform", "translate(" + padding + ",0)");
+
+        // X axis
+        var xScale = d3.scaleBand()
+                       .range([ 0, svgwidth - padding])
+                       .domain(val_cnts.map(function(d) { return d.time;})).padding(0.2);
+
+        svg.append("g")
+           .attr("transform", "translate(0," + svgheight + ")")
+           .call(d3.axisBottom(xScale))
+
+        // Y axis
+        var yScale = d3.scaleLinear()
+                       .domain([0,
+                                d3.max(val_cnts, function(d){return d.Count;})+ padding*100])
+                       .range([svgheight,0]);
+        
+        svg.append("g").call(d3.axisLeft(yScale));
+
+        // Bars
+        svg.selectAll("mybar")
+           .data(val_cnts)
+           .enter()
+           .append("rect")
+           .attr("x", function(d) { return xScale(d.time);})
+           .attr("y", function(d) { return yScale(d.Count);})
+           .attr("width", xScale.bandwidth())
+           .attr("height", function(d) { return svgheight - yScale(d.Count); })
+           .attr("fill", 'red');
+
+                    // ADD X AND Y AXIS TITLES
+            svg.append("text")
+                .attr("class", "x_label")
+                .attr("text-anchor", "middle")
+                .attr("x", svgwidth/2 - padding/2)
+                .attr("y", svgheight )
+                .attr("dy", "2.35em")
+                .text(str).attr("font-family", "sans-serif").attr("font-size", "13px").attr("font-weight", "bold").attr("fill", "black");
+
+            svg.append("text")
+                .attr("class", "y_yabel")
+                .attr("text-anchor", "end")
+                .attr("x", -svgheight/2 )
+                .attr("y",-padding)
+                .attr("dy", "1.5em")
+                .attr("dx", "3em")
+                .attr("transform", "rotate(-90)")
+                .text("Number of Accidents").attr("font-family", "sans-serif").attr("font-size", "13px").attr("font-weight", "bold").attr("fill", "black");
+        }
+
+                // console.log(fm3.get(2016))
+       getBars(data, 'Year')
+        d3.select("#radio_q3").attr('name','time').on("change",d=>{
+            console.log(d.target.value);
+            var year = d.target.value
+            getBars(data, year)
+            console.log(year)
+        })
+
+    })
+
     
 }
 
