@@ -147,7 +147,7 @@ var question1=function(filePath){
             .attr("text-anchor", "middle")
             .attr("x", width/2 )
             .attr("y", height )
-            .attr("dy", "1.95em")
+            .attr("dy", "1.75em")
             .text("Hour of Day").attr("font-family", "sans-serif").attr("font-size", "15px").attr("font-weight", "bold").attr("fill", "black");
 
         svg.append("text")
@@ -255,7 +255,6 @@ var question2=function(filePath){
 
             svg.append("g")
                .attr("transform", "translate(0," + svgheight + ")")
-               .transition().duration(1000)
                .call(d3.axisBottom(xScale).tickFormat(formatxAxis).ticks(12))
 
             var yScale = d3.scaleLinear()
@@ -267,7 +266,7 @@ var question2=function(filePath){
             .transition().duration(1000)
             .call(d3.axisLeft(yScale));
 
-            var Tooltip = d3.select("#q3_plot").append("div").style("opacity", 0).attr("class", "tooltip");
+            var Tooltip = d3.select("#q2_plot").append("div").style("opacity", 0).attr("class", "tooltip");
 
 
             svg.append('g')
@@ -318,8 +317,8 @@ var question2=function(filePath){
                 .attr("text-anchor", "end")
                 .attr("x", -svgheight/2 )
                 .attr("y",-padding)
-                .attr("dy", "1.5em")
-                .attr("dx", "3em")
+                .attr("dy", "1.6em")
+                .attr("dx", "3.5em")
                 .attr("transform", "rotate(-90)")
                 .text("Number of Accidents").attr("font-family", "sans-serif").attr("font-size", "13px").attr("font-weight", "bold").attr("fill", "black");
 
@@ -425,6 +424,7 @@ var question3=function(filePath){
            .attr("transform", "translate(0," + svgheight + ")")
            .call(d3.axisBottom(xScale))
 
+
         // Y axis
         var yScale = d3.scaleLinear()
                        .domain([0,
@@ -444,7 +444,8 @@ var question3=function(filePath){
            .attr("y", function(d) { return yScale(d.Count);})
            .attr("width", xScale.bandwidth())
            .attr("height", function(d) { return svgheight - yScale(d.Count); })
-           .attr("fill", 'red');
+           .attr("fill", 'red')                
+
 
                     // ADD X AND Y AXIS TITLES
             svg.append("text")
@@ -461,7 +462,7 @@ var question3=function(filePath){
                 .attr("x", -svgheight/2 )
                 .attr("y",-padding)
                 .attr("dy", "1.5em")
-                .attr("dx", "3em")
+                .attr("dx", "3.5em")
                 .attr("transform", "rotate(-90)")
                 .text("Number of Accidents").attr("font-family", "sans-serif").attr("font-size", "13px").attr("font-weight", "bold").attr("fill", "black");
         }
@@ -479,7 +480,6 @@ var question3=function(filePath){
                 getBars(hr_data, str)
             }
             
-            console.log(year)
         })
 
     })
@@ -508,52 +508,258 @@ var question5=function(filePath){
 
     data.then(function(data) {
 
-    let data2 = [1, 2, 3, 4, 5]
-    let stats = d3.boxplotStats(data2)
-    let x = d3.scaleLinear()
-      .domain(d3.extent(data2))
-      .range([0, 300])
-    let plot = d3.boxplot().scale(x)
-    d3.select('#q5_plot').datum(stats).call(plot)
-  //   const X = d3.map(data, function(d){return d.Severity;});
-  //   const Y = d3.map(data, function(d){return d.Temperature;});
 
-  // // Filter undefined values.
-  // const I = d3.range(X.length).filter(i => !isNaN(X[i]) && !isNaN(Y[i]));
+    var f = []
+    data.map(function(d) {
+            if (d.Severity == 1){
+                            f.push(d.Temperature);
+            }
 
-  // // Compute the bins.
-  // const B = d3.bin()
-  //     .thresholds(d3.map(data, function(d){return d.Temperature;}))
-  //     .value(i => X[i])
-  //   (I)
-  //   .map(bin => {
-  //     const y = i => Y[i];
-  //     const min = d3.min(bin, y);
-  //     const max = d3.max(bin, y);
-  //     const q1 = d3.quantile(bin, 0.25, y);
-  //     const q2 = d3.quantile(bin, 0.50, y);
-  //     const q3 = d3.quantile(bin, 0.75, y);
-  //     const iqr = q3 - q1; // interquartile range
-  //     const r0 = Math.max(min, q1 - iqr * 1.5);
-  //     const r1 = Math.min(max, q3 + iqr * 1.5);
-  //     bin.quartiles = [q1, q2, q3];
-  //     bin.range = [r0, r1];
-  //     bin.outliers = bin.filter(i => Y[i] < r0 || Y[i] > r1);
-  //     return bin;
-  //   });
+        })
 
-  //   console.log(B)
+    console.log(f)
 
-    // var data_sorted = data.sort(d3.ascending)
-    // var q1 = d3.quantile(data_sorted, .25)
-    // var median = d3.quantile(data_sorted, .5)
-    // var q3 = d3.quantile(data_sorted, .75)
-    // var interQuantileRange = q3 - q1
-    // var min = q1 - 1.5 * interQuantileRange
-    // var max = q1 + 1.5 * interQuantileRange
+    // Compute summary statistics used for the box:
+    var data_sorted = f.sort(d3.ascending)
+    var q1 = d3.quantile(data_sorted, .25)
+    var median = d3.quantile(data_sorted, .5)
+    var q3 = d3.quantile(data_sorted, .75)
+    var interQuantileRange = q3 - q1
+    var min = q1 - 1.5 * interQuantileRange
+    var max = q1 + 1.5 * interQuantileRange
 
-    // console.log(val_cnts);
+    var margin = {top: 10, right: 50, bottom: 30, left: 50},
+  width = 700 - margin.left - margin.right,
+  height = 400 - margin.top - margin.bottom;
 
+// append the svg object to the body of the page
+var svg = d3.select("#q5_plot")
+.append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+.append("g")
+  .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+  // Show the X scale
+  var x = d3.scaleBand()
+    .range([ 0, width ])
+    .domain(["1 (least severe)", "2", "3", "4 (most severe)"])
+    // .paddingInner(1)
+    // .paddingOuter(.5)
+  svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+
+    console.log(x)
+
+  var y = d3.scaleLinear()
+  .domain([-20,max+20])
+  .range([height, 0]);
+svg.append("g").call(d3.axisLeft(y))
+
+// a few features for the box
+var center =  [75, 225,375, 525]//[200, 400,600, 800]//[70, 220,370, 520]//[100, 250,400, 550]
+var width = 100
+
+// Show the main vertical line
+svg
+.append("line")
+  .attr("x1", center[0])
+  .attr("x2", center[0])
+  .attr("y1", y(min) )
+  .attr("y2", y(max) )
+  .attr("stroke", "black")
+
+// Show the box
+svg
+.append("rect")
+  .attr("x", center[0] - width/2)
+  .attr("y", y(q3) )
+  .attr("height", (y(q1)-y(q3)) )
+  .attr("width", width )
+  .attr("stroke", "black")
+  .style("fill", "#69b3a2")
+
+// show median, min and max horizontal lines
+svg
+.selectAll("toto")
+.data([min, median, max])
+.enter()
+.append("line")
+  .attr("x1", center[0]-width/2)
+  .attr("x2", center[0]+width/2)
+  .attr("y1", function(d){ return(y(d))} )
+  .attr("y2", function(d){ return(y(d))} )
+  .attr("stroke", "black")
+
+
+  var f = []
+    data.map(function(d) {
+            if (d.Severity == 2){
+                            f.push(d.Temperature);
+            }
+
+        })
+
+    console.log(f)
+
+    // Compute summary statistics used for the box:
+    var data_sorted = f.sort(d3.ascending)
+    var q1 = d3.quantile(data_sorted, .25)
+    var median = d3.quantile(data_sorted, .5)
+    var q3 = d3.quantile(data_sorted, .75)
+    var interQuantileRange = q3 - q1
+    var min = q1 - 1.5 * interQuantileRange
+    var max = q1 + 1.5 * interQuantileRange
+
+// Show the main vertical line
+svg
+.append("line")
+  .attr("x1", center[1])
+  .attr("x2", center[1])
+  .attr("y1", y(min) )
+  .attr("y2", y(max) )
+  .attr("stroke", "black")
+// Show the box
+svg
+.append("rect")
+  .attr("x", center[1] - width/2)
+  .attr("y", y(q3) )
+  .attr("height", (y(q1)-y(q3)) )
+  .attr("width", width )
+  .attr("stroke", "black")
+  .style("fill", "#69b3a2")
+
+// show median, min and max horizontal lines
+svg
+.selectAll("toto")
+.data([min, median, max])
+.enter()
+.append("line")
+  .attr("x1", center[1]-width/2)
+  .attr("x2", center[1]+width/2)
+  .attr("y1", function(d){ return(y(d))} )
+  .attr("y2", function(d){ return(y(d))} )
+  .attr("stroke", "black")
+
+  var f = []
+    data.map(function(d) {
+            if (d.Severity == 3){
+                            f.push(d.Temperature);
+            }
+
+        })
+
+    console.log(f)
+
+    // Compute summary statistics used for the box:
+    var data_sorted = f.sort(d3.ascending)
+    var q1 = d3.quantile(data_sorted, .25)
+    var median = d3.quantile(data_sorted, .5)
+    var q3 = d3.quantile(data_sorted, .75)
+    var interQuantileRange = q3 - q1
+    var min = q1 - 1.5 * interQuantileRange
+    var max = q1 + 1.5 * interQuantileRange
+
+// Show the main vertical line
+svg
+.append("line")
+  .attr("x1", center[2])
+  .attr("x2", center[2])
+  .attr("y1", y(min) )
+  .attr("y2", y(max) )
+  .attr("stroke", "black")
+// Show the box
+svg
+.append("rect")
+  .attr("x", center[2] - width/2)
+  .attr("y", y(q3) )
+  .attr("height", (y(q1)-y(q3)) )
+  .attr("width", width )
+  .attr("stroke", "black")
+  .style("fill", "#69b3a2")
+
+// show median, min and max horizontal lines
+svg
+.selectAll("toto")
+.data([min, median, max])
+.enter()
+.append("line")
+  .attr("x1", center[2]-width/2)
+  .attr("x2", center[2]+width/2)
+  .attr("y1", function(d){ return(y(d))} )
+  .attr("y2", function(d){ return(y(d))} )
+  .attr("stroke", "black")
+
+    var f = []
+    data.map(function(d) {
+            if (d.Severity == 4){
+                            f.push(d.Temperature);
+            }
+
+        })
+
+    console.log(f)
+
+    // Compute summary statistics used for the box:
+    var data_sorted = f.sort(d3.ascending)
+    var q1 = d3.quantile(data_sorted, .25)
+    var median = d3.quantile(data_sorted, .5)
+    var q3 = d3.quantile(data_sorted, .75)
+    var interQuantileRange = q3 - q1
+    var min = q1 - 1.5 * interQuantileRange
+    var max = q1 + 1.5 * interQuantileRange
+
+// Show the main vertical line
+svg
+.append("line")
+  .attr("x1", center[3])
+  .attr("x2", center[3])
+  .attr("y1", y(min) )
+  .attr("y2", y(max) )
+  .attr("stroke", "black")
+// Show the box
+svg
+.append("rect")
+  .attr("x", center[3] - width/2)
+  .attr("y", y(q3) )
+  .attr("height", (y(q1)-y(q3)) )
+  .attr("width", width )
+  .attr("stroke", "black")
+  .style("fill", "#69b3a2")
+
+// show median, min and max horizontal lines
+svg
+.selectAll("toto")
+.data([min, median, max])
+.enter()
+.append("line")
+  .attr("x1", center[3]-width/2)
+  .attr("x2", center[3]+width/2)
+  .attr("y1", function(d){ return(y(d))} )
+  .attr("y2", function(d){ return(y(d))} )
+  .attr("stroke", "black")
+
+
+                    // ADD X AND Y AXIS TITLES
+            svg.append("text")
+                .attr("class", "x_label")
+                .attr("text-anchor", "middle")
+                .attr("x", 300)
+                .attr("y", height )
+                .attr("dy", "1.85em")
+                .text("Severity Category").attr("font-family", "sans-serif").attr("font-size", "13px").attr("font-weight", "bold").attr("fill", "black");
+
+            svg.append("text")
+                .attr("class", "y_yabel")
+                .attr("text-anchor", "end")
+                .attr("x", -height/2 )
+                .attr("y",-50)
+                .attr("dy", "1.8em")
+                .attr("dx", "4em")
+                .attr("transform", "rotate(-90)")
+                .text("Temperature (Farenheight)").attr("font-family", "sans-serif").attr("font-size", "13px").attr("font-weight", "bold").attr("fill", "black");
 
 
     });
