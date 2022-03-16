@@ -3,6 +3,11 @@
 <script type="text/javascript" src="app.js"></script>  
 <link rel="stylesheet" href="styles.css">
 <script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+<script src="https://d3js.org/d3-queue.v3.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+<script src="https://d3js.org/d3.v6.js"></script>
+
 
 </head>
 <body onload=assignment2()> 
@@ -59,6 +64,7 @@
         <label for="Hour">Hour</label><br>
 
     </div>
+    </div>
     <h4>Plot:</h4>
     <div id="q3_plot" class="center_plot">
     </div>
@@ -68,22 +74,26 @@
 <h3>Question 4:</h3>
 <div id="q4">
 
-        <div id="drop_down_y_q4" class="center_plot">
+<!--         <div id="drop_down_y_q4" class="center_plot">
     <label id="q4_y" for="cars">Choose Y-Axis Variable:</label>
-    <select name="cars" id="cars">
-  <option value="volvo">Volvo</option>
-  <option value="saab">Saab</option>
-  <option value="mercedes">Mercedes</option>
-  <option value="audi">Audi</option>
+    <select name="y" id="q4_y1">
+  <option value="Temperature">Temperature</option>
+  <option value="Wind Speed">Wind Speed</option>
+  <option value="Precipitation">Precipitation</option>
+  <option value="Pressure">Pressure</option>
+   <option value="Visibility">Visibility</option>
+    <option value="Humidity">Humidity</option>
 </select>
 
     <label id="q4_x" for="cars">&emsp;Choose X-Axis Variable:</label>
-    <select name="cars" id="cars">
-  <option value="volvo">Volvo</option>
-  <option value="saab">Saab</option>
-  <option value="mercedes">Mercedes</option>
-  <option value="audi">Audi</option>
-</select>
+    <select name="x" id="q4_x2">
+  <option value="Wind Speed">Wind Speed</option>
+  <option value="Temperature">Temperature</option>
+  <option value="Precipitation">Precipitation</option>
+  <option value="Pressure">Pressure</option>
+   <option value="Visibility">Visibility</option>
+    <option value="Humidity">Humidity</option>
+</select> -->
         </div>
     <h4>Plot:</h4>
     <div id="q4_plot" class="center_plot">
@@ -100,6 +110,69 @@
     </div>
     <h4>Plot:</h4>
     <div id="q5_plot" class="center_plot">
+    </div>
+</div>    
+
+<div>
+<h3>Question 6:</h3>
+
+<div id="q6">
+
+<!--             <div id="radio6" class="center_plot">
+            <h4>*Plot will take a few seconds to load*</h6>
+            <h4>*1% of dataset is used due to large size.*</h6> -->
+            <!-- <input type="radio" id="speed" name="env_factor" value="Speed" />
+            <label for="speed">Speed (mph)</label> -->
+          <!--   <input
+                type="radio"
+                id="temperature"
+                name="env_factor"
+                value="Temperature"
+                checked="checked"
+            />
+            <label for="temperature">Temperature (F)</label>
+
+            <input
+                type="radio"
+                id="humidity"
+                name="env_factor"
+                value="Humidity"
+            />
+            <label for="humidity">Humidity</label>
+
+            <input
+                type="radio"
+                id="pressure"
+                name="env_factor"
+                value="Pressure"
+            />
+            <label for="pressure">Air Pressure (in)</label>
+
+            <input
+                type="radio"
+                id="windspeed"
+                name="env_factor"
+                value="Windspeed"
+            />
+            <label for="windspeed">Wind Speed (mph)</label>
+        </div> -->
+
+
+
+</div>  
+    </div>
+    <h4>Plot:</h4>
+    <div id="q6_plot" class="center_plot">
+    </div>
+</div>    
+   
+    
+
+
+</div>  
+    </div>
+    <h4>Plot:</h4>
+    <div id="q7_plot" class="center_plot">
     </div>
 </div>    
    
