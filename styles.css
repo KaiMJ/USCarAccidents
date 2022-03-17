@@ -1,21 +1,16 @@
 h1 {
     text-align: center;
 }
-
-.center_plot {
-    margin: auto;
+.box-line {
+    stroke-width: 3px;
+}
+#radio4, #radio6 {
     text-align: center;
 }
-
-.section {
-    text-align: center;
+#q4_plot, #q6_plot {
+    background-color: pink;
 }
 
-div.tooltip{
-    position:absolute;
+div {
     text-align: center;
-    width: "fit-content";
-    height: "fit-content";
-    background: grey;
-    padding: 10px;
 }
