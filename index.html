@@ -1,12 +1,212 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<html>  
+<head>  
+<script type="text/javascript" src="app.js"></script>  
+<link rel="stylesheet" href="styles.css">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+<script src="https://d3js.org/d3-queue.v3.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-color@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-interpolate@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-scale@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-scale-chromatic@3"></script>
+
+
 </head>
-<body>
+<body onload=assignment2()> 
+
+
+<div>
+        <h1>Analysis of U.S. Accidents (2016-2021)</h1>
+                <div id="NOTE" class="center_plot">
+            <h3><a href="https://www.kaggle.com/datasets/sobhanmoosavi/us-accidents">Original Dataset</a></h3>
+        </div>
+
+
+<div>
+<h3>Question 1: How many total accidents for each hour of the day and for each year?</h3>
+<div id="q1">
+        <h4>Plot:</h4>
+    </div>
+
+    <div id="q1_plot" class="center_plot">
+    </div>
+</div>    
+<!-- <h4>
+Color Scheme Choice: We chose a inferno color scheme because it is better human perception (making it more intuitive) since darker colors represent smaller values while brighter colors represent larger values which appropriatley matches the definition of a heatmap.<br><br>
+Marks: The marks for this plot is the area (2D size) for each grid position for each year and hour of day. <br><br>
+Channels: The main channel for a heat map are the color hues where darker hues represent smaller values and brighter hues represent higher values. Also this plot has horizontal spatial position channel of the areas to correspond to the ordering of the hours of day key (ordered) while also seperated horizontally (separated and ordered by key attribute into horizontal regions). Also there is another identity channel for the veritical spatial position of the areas to correspond to the ordering of the year key (ordered) while also seperated verically (separated and ordered by key attribute into vertical regions).<br><br>
+<h4> -->
+
+</div>
     
-</body>
-</html>
+<div>
+<h3><br><br>Question 2: What are the total number of accidents for each month for the various years?</h3>
+    <h4>Plot:</h4>
+        <div id="q2_title" class="center_plot">     </div>
+    <div id="radio" class="center_plot">
+        <input type="radio" id="q1_2016" name="year" value="2016" checked="checked">
+        <label for="2016">2016</label>
+        <input type="radio" id="q1_2017" name="year" value="2017">
+        <label for="2017">2017</label>
+        <input type="radio" id="q1_2018" name="year" value="2018">
+        <label for="2018">2018</label>
+        <input type="radio" id="q1_2019" name="year" value="2019">
+        <label for="2019">2019</label>
+        <input type="radio" id="q1_2020" name="year" value="2020">
+        <label for="2020">2020</label>
+        <input type="radio" id="q1_2021" name="year" value="2021">
+        <label for="2021">2021</label><br>
+        </div>
+<div id="q2">
+
+    </div>
+
+    <div id="q2_plot" class="center_plot">
+    </div>
+<!-- <h4>
+Color Scheme Choice: We choose this shade of blue for the bars because it is colorblind friendly.<br><br>
+Marks: The marks for this plot are the points for the values as well as the line connection marks that connect the point marks.<br><br>
+Channels: The channels are horizontal and vertical position for each value attribute and aligned lengths to express these quantative values. An identity channel used is the horizontal spatial position channel of the points to correspond to the ordering of the labels (ordered) for the key (month) while also seperated horizontally (separated and ordered by key attribute into horizontal regions).<br><br>
+<h4> -->
+</div>    
+
+<div>
+<h3><br><br>Question 3: What are the total number of accidents for each year, month, and hour of day?</h3>
+    <h4>Plot:</h4>
+            <div id="q3_title" class="center_plot">    </div>
+<div id="q3">
+        <div id="radio_q3" class="center_plot">
+        <input type="radio" id="q3_Year" name="time" value="Year" checked="checked">
+        <label for="Year">Year</label>
+        <input type="radio" id="q3_Month" name="time" value="Month">
+        <label for="Month">Month</label>
+        <input type="radio" id="q3_Hour" name="time" value="Hour">
+        <label for="Hour">Hour of Day</label><br>
+
+    </div>
+
+    </div>
+
+    <div id="q3_plot" class="center_plot">
+    </div>
+
+    <!-- <h4>
+Color Scheme Choice: We choose this shade of orange for the bars because it is colorblind friendly.<br><br>
+Marks:  The marks for this plot are the lines for vertical positions that correspond to the bars representing each year/month/hour of day (geometric primitives for key items).  <br><br>
+Channels: The channels in this plot include the length of the bar (length of marks) to express quantative values (magnitude) for the number of accidents (expresses value attribute with aligned vertical position). Also an identity channel used is for horizontal spatial position channel of the bars (marks) to correspond to the ordering of the labels (ordered) for the key (month/year/hour of day), thus seperated horizontally while also aligned vertically. <br><br><br>
+<h4> -->
+
+</div>    
+   
+<div>
+<h3><br><br>Question 4: What is the relationship between temperature and humidity for the most severe accidents?</h3>
+    <h4>Plot:</h4>
+<div id="q4">
+
+        </div>
+
+    <div id="q4_plot" class="center_plot">
+    </div>
+
+<!-- <h4>
+Color Scheme Choice:  We choose this shade of blue for the bars because it is colorblind friendly. <br><br>
+Marks: The marks for this plot are the points for the values.<br><br>
+Channels: The channels include the horizontal and vertical spatial positioning of the points (marks) to express values for the quantative attributes. <br><br>
+<h4> -->
+</div>    
+
+<div>
+<h3><br><br>Question 5: What is the distribution of Temperatures during all accidents for various severness categories?</h3>
+
+<div id="q5">
+
+
+</div>  
+    </div>
+    <h4>Plot:</h4>
+    <div id="q5_plot" class="center_plot">
+    </div>
+    <!-- <h4>
+Color Scheme Choice: We choose this shade of green for the green because it is colorblind friendly.<br><br>
+Marks: The marks would be 2D (area) to show the distribution between the the top quartile (Q3) and the bottom quartile (Q1); the horizontal lines showing Q1, Q2 (median), Q3, the lower fence, upper fence; and the verticle line between Q1 and the lower fence as well as verticle line between Q3 and upper fence. <br><br>
+Channels: The channels include the verticle positioning and lengths to represent distance between Q1 and the lower fence as well as the verticle positioning and length and between Q3 and upper fence. Also the vertical positioning of the horizontal lines to show where the 3 quartiles and upper and lower fence lie in the distribution.<br><br>
+<h4> -->
+
+</div>    
+
+<div>
+<h3><br><br>Question 6: How do the total number of accidents vary per state and each region of the united states over time (West, Midwest, North East, South)?</h3>
+    <h4>Plot:</h4>
+        <div id="NOTE2" class="center_plot">
+            <h4>*Random 1% of data is used to make the plot less noisy and due to the overhead of the full data*</h4>
+        </div>
+
+<div id="q6">
+
+        <div id="q6_title" class="center_plot">
+    </div>
+
+        <div id="radio6" class="center_plot">
+            <input
+                type="radio"
+                id="West"
+                name="regions"
+                value="West"
+                checked="checked"
+            />
+            <label for="West">West</label>
+
+            <input type="radio" id="midwest" name="regions" value="Midwest" />
+            <label for="midwest">Midwest</label>
+
+            <input
+                type="radio"
+                id="northeast"
+                name="regions"
+                value="Northeast"
+            />
+            <label for="northeast">North East</label>
+            <input type="radio" id="south" name="regions" value="South" />
+            <label for="south">South</label>
+        </div>
+
+        <div id="NOTE" class="center_plot">
+            <h4>*Click and drag to zoom in*</h4>
+        </div>
+        <div id="q6_plot" class="center_plot"></div>
+<!-- <h4>
+Color Scheme Choice: We chose 14 various hues to represent the states in each region since these many different hues will allow for easy distinguishing of the different states. <br><br>
+Marks: The marks would be the 2D area representing each state in a region.  <br><br>
+Channels: The channels would be the horizontal position of the areas to express the magnitudes and the color hues as an identity channel to differentiate between the states. <br><br>
+<h4> -->
+
+</div>    
+   
+    
+
+
+<div>
+<h3><br><br>Question 7: What does the distribution of accidents for each state look for all the years?</h3>
+<div id="q7">
+    </div>
+    <h4>Plot:</h4>
+
+        <div id="NOTE" class="center_plot">
+            <h4>*Dataset does not provide data on Hawaii and Alaska*</h4>
+        </div>
+    <div id="q7_plot" class="center_plot">
+    </div>
+</div>    
+
+<!-- <h4>
+Color Scheme Choice: We choose various saturations of blue for the color scheme since blue is color blind friendly and so we may represent smaller values with less saturated blues and greater values with a more saturated blues.<br><br>
+Marks: The marks 2D areas for each state. <br><br>
+Channels: The channels include the verticle and horizontal positioning of the areas to correspond to the geography of the United States as well as a color saturation channel to show the magnitude of accident counts in each states (lower saturations correspond to lesser counts and higher saturations correspond to higher counts).<br><br>
+<h4> -->
+</div>
+   
+    
+   
+</body>  
+</html>  
